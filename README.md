@@ -2,6 +2,10 @@
 
 Projeto de sistema para automação para facilitar a busca de informações do CNPJ de empresas e converter os dados para uma planilha.
 
+### Como executar
+
+Na pasta raíz do projeto: `uvicorn src.main:app --reload`
+
 <div align="center">
   <img src="https://github.com/user-attachments/assets/7eaa9442-73cd-45f8-b601-843f0072179c">
 </div>
