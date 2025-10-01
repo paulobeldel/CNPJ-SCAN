@@ -1,5 +1,14 @@
+"""
+Módulo de serviço de extração de dados do cartão CNPJ
+
+Responsável por
+- receber conteúdo de um PDF
+- extrair o texto com a lib PyMuPDF
+- extrair os dados do PDF buscando os campos com padrões de Regex
+- lidar com erros
+"""
+
 import fitz
-import io
 import re
 
 

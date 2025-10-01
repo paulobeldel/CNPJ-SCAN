@@ -1,7 +1,15 @@
-from fastapi import APIRouter, UploadFile, File, Query, Body, HTTPException
-from fastapi.responses import Response
+"""
+Módulo que define os endpoints ligados a extração de dados do cartão CNPJ
+
+Responsável por
+- receber o arquivo PDF do frontend
+- chamar o serviço de extração de dados
+- retornar os dados em formato JSON
+- lidar com erros
+"""
+
+from fastapi import APIRouter, UploadFile, File
 from src.services.extraction_service import extract_data_from_pdf
-from src.services.csv_service import generate_csv_from_data
 from typing import Dict, Any
 
 router = APIRouter()
@@ -9,7 +17,7 @@ router = APIRouter()
 
 # Upload e extração de informações do PDF
 # Recebe um arquivo e retorna um JSON com os dados
-@router.post("/upload/")
+@router.post("/extract_data/")
 async def upload(file: UploadFile = File(...)):
 
     # Falta o tratamento de erro (!)

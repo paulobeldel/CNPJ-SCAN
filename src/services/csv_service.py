@@ -1,3 +1,11 @@
+"""
+Módulo de serviço de geração de CSV
+
+Responsável por
+- receber um dicionário de dados e uma lista de strings
+- gerar o cabeçalho e as linhas do arquivo CSV
+"""
+
 from typing import Dict, Any
 import csv
 import io

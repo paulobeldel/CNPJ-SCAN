@@ -1,3 +1,11 @@
+"""
+Módulo principal da aplicação FastAPI
+
+Responsável por
+- inicializar a aplicação FastAPI
+- incluir os roteadores (de routers/) da API
+"""
+
 from fastapi import FastAPI
 from src.routers import cnpj, reports
 

@@ -1,3 +1,12 @@
+"""
+Módulo que define os endpoints ligados a geração e download de relatórios.
+
+Responsável por
+- receber dados em JSON
+- chamar serviço de geração de CSV
+- retornar arquivo CSV para download
+"""
+
 from fastapi import APIRouter, Query, Body, HTTPException
 from fastapi.responses import Response
 from src.services.csv_service import generate_csv_from_data
