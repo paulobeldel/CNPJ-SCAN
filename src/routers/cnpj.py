@@ -30,7 +30,3 @@ async def upload(file: UploadFile = File(...)):
 
     # Retorna o JSON
     return extracted_data
-
-
-    
-    

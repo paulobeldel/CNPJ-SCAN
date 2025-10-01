@@ -67,14 +67,17 @@ async def extract_data_from_pdf(pdf_content: bytes):
     try:
         doc = fitz.open(stream=pdf_content, filetype="pdf")
         page = doc[0]
-        full_text = page.get_text("text")
+        full_text = page.getText("text")
 
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
 
-    except Exception as e:
-        return {"error": f"Erro ao processar o arquivo: {e}"}
-    
-        # (!) O tratamento de erros é basicamente inexistente..
+    except fitz.FileDataError:
+        return {"error": "O arquivo fornecido não é um PDF válido ou está corrompido."}
+    except IndexError:
+        # Captura erros ao acessar páginas inexistentes
+        return {"error": "O PDF não contém páginas ou a página solicitada não existe."}
+    except re.error as regex_error:
+        return {"error": f"Erro na expressão regular: {regex_error}"}
 
     return extracted_data
