@@ -72,6 +72,9 @@ async def extract_data_from_pdf(pdf_content: bytes):
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
 
+        # se o json vier com os campos nulos, vamos levantar erro de negocio
+
+        
     except Exception as e:
         return {"error": f"Erro ao processar o arquivo: {e}"}
     
