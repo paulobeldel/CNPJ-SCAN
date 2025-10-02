@@ -67,7 +67,7 @@ async def extract_data_from_pdf(pdf_content: bytes):
     try:
         doc = fitz.open(stream=pdf_content, filetype="pdf")
         page = doc[0]
-        full_text = page.getText("text")
+        full_text = page.get_text("text")
 
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
