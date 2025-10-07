@@ -11,6 +11,7 @@ from fastapi import APIRouter, Query, Body, HTTPException
 from fastapi.responses import Response
 from src.services.csv_service import generate_csv_from_data
 from typing import Dict, Any
+from src.core.exeptions import InvalidReportDataError
 
 router = APIRouter()
 
@@ -31,10 +32,16 @@ async def download_csv(
             headers={"Content-Disposition": 'attachment; filename="cnpj_scan.csv"'}
         )
     
+    except InvalidReportDataError as e:
+        # O usuário enviou dados inválidos ou vazios
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        ) from e
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {e}")
-    
-        # Falta especificar as Exceptions (!)
-
-
-
+        # Qualquer outro erro inesperado
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro interno ao gerar o relatório: {e}"
+        ) from e
