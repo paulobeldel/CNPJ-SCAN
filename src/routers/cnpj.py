@@ -42,6 +42,7 @@ async def extract(file: UploadFile = File(...)):
         )
 
     # Em caso de sucesso retornar os dados extraídos
-    return extracted_data
-
-   
+    return {
+        "filename": file.filename,
+        "extracted_data": extracted_data
+    }

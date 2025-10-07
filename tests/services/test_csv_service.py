@@ -1,6 +1,7 @@
 import pytest
 from src.services.csv_service import generate_csv_from_data
 from typing import Dict, Any
+from src.core.exeptions import InvalidReportDataError
 
 # Dados de exemplo para os testes
 
@@ -45,9 +46,7 @@ def test_generate_csv_all_fields():
     assert csv_result == expected_csv
 
 def test_generate_csv_selected_fields():
-    """
-    Testa a geração de CSV com campos selecionados.
-    """
+    """Testa a geração de CSV com campos selecionados."""
 
     selected_fields = ['numero_de_inscricao', 'nome_empresarial', 'cep', 'municipio', 'uf', 'telefone']
 
@@ -61,3 +60,14 @@ def test_generate_csv_selected_fields():
     csv_result = generate_csv_from_data(test_data, field_names=selected_fields)
 
     assert csv_result == expected_csv
+
+def test_generate_csv_empty_data():
+    """Testa a geração de CSV com dados vazios."""
+
+    empty_data = {}
+
+    # Resultado esperado -> Erro levantado
+    with pytest.raises(InvalidReportDataError) as exc_info:
+        generate_csv_from_data(empty_data)
+
+    assert "Não há dados válidos para gerar o CSV." in str(exc_info.value)

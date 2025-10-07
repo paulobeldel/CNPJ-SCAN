@@ -70,8 +70,8 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
 
-        # Verifica se o campo número de inscrição foi encontrado
-        if not extracted_data.get('numero_de_inscricao'):
+        # Verifica se o campo número de inscrição foi encontrado (usando 2 campos chave para validar)
+        if not extracted_data.get('numero_de_inscricao') and not extracted_data.get('nome_empresarial'):
             raise InvalidCNPJDocumentError("O documento PDF não é um cartão CNPJ válido.")
 
     except InvalidCNPJDocumentError as e:
