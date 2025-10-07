@@ -16,7 +16,7 @@ router = APIRouter()
 
 # Download do CSV
 # Recebe os dados em JSON e retorna o arquivo CSV
-@router.post("/download-csv/")
+@router.post("/download-csv/", tags=["Reports"])
 async def download_csv(
     data: Dict[str, Any] = Body(...),
     fields: list[str] = Query(None, description="Lista dos campos requisitados pelo usuario")

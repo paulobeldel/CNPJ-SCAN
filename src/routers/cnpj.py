@@ -14,11 +14,18 @@ from typing import Dict, Any
 
 router = APIRouter()
 
+@router.post("/upload_filename/", tags=["CNPJ"])
+async def get_filename(file: UploadFile = File(...)):
+
+    # Retorna o nome do arquivo
+    return {
+        "filename": file.filename
+        }
 
 # Upload e extração de informações do PDF
 # Recebe um arquivo e retorna um JSON com os dados
-@router.post("/extract_data/")
-async def upload(file: UploadFile = File(...)):
+@router.post("/extract_data/", tags=["CNPJ"])
+async def extract(file: UploadFile = File(...)):
 
     # Falta o tratamento de erro (!)
 
@@ -29,4 +36,8 @@ async def upload(file: UploadFile = File(...)):
     extracted_data = await extract_data_from_pdf(pdf_content)
 
     # Retorna o JSON
-    return extracted_data
+    return {
+        "filename": file.filename,
+        "extracted_data": extracted_data
+        }
+
