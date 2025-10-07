@@ -14,11 +14,18 @@ from typing import Dict, Any
 
 router = APIRouter()
 
+@router.post("/upload_filename/", tags=["CNPJ"])
+async def get_filename(file: UploadFile = File(...)):
+
+    # Retorna o nome do arquivo
+    return {
+        "filename": file.filename
+        }
 
 # Upload e extração de informações do PDF
 # Recebe um arquivo e retorna um JSON com os dados
-@router.post("/extract_data/")
-async def upload(file: UploadFile = File(...)):
+@router.post("/extract_data/", tags=["CNPJ"])
+async def extract(file: UploadFile = File(...)):
 
     # Lê o conteudo do arquivo em bytes
     pdf_content = await file.read()
