@@ -10,6 +10,8 @@ Responsável por
 
 import fitz
 import re
+from typing import Dict, Any
+from src.core.exeptions import InvalidCNPJDocumentError
 
 
 # Função auxiliar para procurar padrões de texto
@@ -23,18 +25,14 @@ def _extract_field(text: str, pattern: str, group_index: int = 1) -> str | None:
         return match.group(group_index).strip()
     return None
 
-# --------------------
-# (!) Quando tem "none" é porque os labels não foram encontrados
-# Então o documento não é cartão cnpj
-# --------------------
-
 
 # Função para extrair as informações
-async def extract_data_from_pdf(pdf_content: bytes):
+async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
     """
     Extrai informações de CNPJ de um PDF de formulário usando Regex.
     """
-    # Dicionário onde ficarão os campos extraídos
+
+    # Estrutura onde ficarão os campos extraídos
     extracted_data = {}
     
     # Dicionário com as labels dos campos e os padrões que serão procurados no PDF
@@ -72,6 +70,12 @@ async def extract_data_from_pdf(pdf_content: bytes):
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
 
+        # Verifica se o campo número de inscrição foi encontrado
+        if not extracted_data.get('numero_de_inscricao'):
+            raise InvalidCNPJDocumentError("O documento PDF não é um cartão CNPJ válido.")
+
+    except InvalidCNPJDocumentError as e:
+        return {"error": str(e)}
     except fitz.FileDataError:
         return {"error": "O arquivo fornecido não é um PDF válido ou está corrompido."}
     except IndexError:

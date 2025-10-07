@@ -1,7 +1,7 @@
 import pytest
 from src.services.extraction_service import _extract_field, extract_data_from_pdf
 
-# Texto de exemplo para os testes
+# Dados de exemplo para os testes
 # Esse é o formato que a lib PyMuPDF extrai do PDF
 sample_text = """
 REPÚBLICA FEDERATIVA DO BRASIL   
@@ -91,15 +91,24 @@ test_data = [
 # Parametrização dos testes (rodar o teste para cada padrão)
 @pytest.mark.parametrize("field, pattern, expected", test_data)
 def test_extract_field(field, pattern, expected):
-    """Testa a extração de um campo com um padrão específico, verfica se o resultado é o esperado."""
-    result = _extract_field(sample_text, pattern)
-    assert result == expected, f"Falha no campo {field}: Esperado '{expected}', Obtido '{result}'"
+    """
+    Testa a extração de um campo (field)
+    com um padrão específico (pattern)
+    e verfica se o resultado é o esperado (expected).
+    """
+    extracted_result = _extract_field(sample_text, pattern)
+    assert extracted_result == expected, f"Falha no campo {field}: Esperado '{expected}', Obtido '{extracted_result}'"
 
 def test_extract_field_not_found():
     """Testa a extração de um campo com um padrão que não existe no texto, deve retornar None."""
+    
+    # Padrão que não existe no texto
     pattern = r'CAMPO QUALQUER INEXISTENTE\s+([^\n]+)'
-    result = _extract_field(sample_text, pattern)
-    assert result is None, f"Esperado None para campo inexistente, mas obteve '{result}'"
+    
+    # Resultado esperado
+    expected_result = _extract_field(sample_text, pattern)
+    
+    assert expected_result is None, f"Esperado None para campo inexistente, mas obteve '{expected_result}'"
 
 # ----Testes do extract_data_from_pdf----
 

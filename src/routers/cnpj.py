@@ -8,7 +8,7 @@ Responsável por
 - lidar com erros
 """
 
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from src.services.extraction_service import extract_data_from_pdf
 from typing import Dict, Any
 
@@ -20,13 +20,21 @@ router = APIRouter()
 @router.post("/extract_data/")
 async def upload(file: UploadFile = File(...)):
 
-    # Falta o tratamento de erro (!)
-
     # Lê o conteudo do arquivo em bytes
     pdf_content = await file.read()
 
     # Chama a função na camada de Services
     extracted_data = await extract_data_from_pdf(pdf_content)
 
-    # Retorna o JSON
+    # Verifica se a camada de serviço retornou um erro
+    if 'error' in extracted_data:
+        # Levanta um erro HTTP
+        raise HTTPException(
+            status_code=400,
+            detail=f"Erro na extração: {extracted_data['error']}"
+        )
+
+    # Em caso de sucesso retornar os dados extraídos
     return extracted_data
+
+   
