@@ -9,7 +9,7 @@ Responsável por
 from typing import Dict, Any
 import csv
 import io
-from src.core.exeptions import InvalidReportDataError
+from src.core.exceptions import InvalidReportDataError
 
 def generate_csv_from_data(
         extracted_data: Dict[str, Any],
@@ -24,6 +24,8 @@ def generate_csv_from_data(
     if not extracted_data or 'error' in extracted_data:
         raise InvalidReportDataError("Não há dados válidos para gerar o CSV.")
 
+    #print("\nDEBUG - Dados extraídos para CSV:", extracted_data)
+
     # Filtrar se uma lista de campos foi passada
     if field_names and len(field_names) > 0:
         filtered_data = {}
@@ -34,8 +36,11 @@ def generate_csv_from_data(
     else:
         data_to_write = extracted_data
     
-    output = io.StringIO()
-    writer = csv.writer(output)
+    output = io.StringIO(newline='')
+    writer = csv.writer(
+        output,
+        quoting=csv.QUOTE_MINIMAL,
+    )
 
     # Primeira linha - cabeçalhos (keys do dict)
     header = list(data_to_write.keys())

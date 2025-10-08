@@ -120,12 +120,15 @@ async def test_extract_data_from_pdf():
     # Caminho do PDF usado no teste
     pdf_path = 'tests/resources/cnpj_sample.pdf'
 
-    # Dicionário com os valores esperados (transformar a lista do ppadrões de teste em dicionário)
-    expected_data = {key: value for key, _, value in test_data}
+    # Dicionário com os dados esperados (transformar a lista do ppadrões de teste em dicionário)
+    expected_data_payload = {key: value for key, _, value in test_data}
+    
+    # O resultado esperado é o payload dentro de outro dicionário
+    expected_result = {"extracted_data": expected_data_payload}
 
     with open(pdf_path, 'rb') as file:
         pdf_content = file.read()
     
     result = await extract_data_from_pdf(pdf_content)
 
-    assert result == expected_data, f"Falha na extração do PDF: Esperado {expected_data}, Obtido {result}"
+    assert result == expected_result, f"Falha na extração do PDF: Esperado {expected_result}, Obtido {result}"
