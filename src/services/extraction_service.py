@@ -11,7 +11,7 @@ Responsável por
 import fitz
 import re
 from typing import Dict, Any
-from src.core.exeptions import InvalidCNPJDocumentError
+from src.core.exceptions import InvalidCNPJDocumentError
 
 
 # Função auxiliar para procurar padrões de texto
@@ -84,4 +84,4 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
     except re.error as regex_error:
         return {"error": f"Erro na expressão regular: {regex_error}"}
 
-    return extracted_data
+    return {"extracted_data": extracted_data}

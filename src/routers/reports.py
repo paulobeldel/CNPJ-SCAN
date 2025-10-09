@@ -11,7 +11,7 @@ from fastapi import APIRouter, Query, Body, HTTPException
 from fastapi.responses import Response
 from src.services.csv_service import generate_csv_from_data
 from typing import Dict, Any
-from src.core.exeptions import InvalidReportDataError
+from src.core.exceptions import InvalidReportDataError
 
 router = APIRouter()
 
@@ -24,7 +24,11 @@ async def download_csv(
     ):
 
     try:
-        csv_string = generate_csv_from_data(data, fields)
+
+        # Pegar os dados da chave extracted_data do dicionário recebido
+        extracted_data = data.get("extracted_data", {})
+
+        csv_string = generate_csv_from_data(extracted_data, fields)
 
         return Response(
             content=csv_string,

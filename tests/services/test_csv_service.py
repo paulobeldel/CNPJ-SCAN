@@ -1,7 +1,7 @@
 import pytest
 from src.services.csv_service import generate_csv_from_data
 from typing import Dict, Any
-from src.core.exeptions import InvalidReportDataError
+from src.core.exceptions import InvalidReportDataError
 
 # Dados de exemplo para os testes
 
