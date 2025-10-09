@@ -13,20 +13,31 @@ import re
 from typing import Dict, Any
 from src.core.exceptions import InvalidCNPJDocumentError
 
+#----------------------------------------------------------------
+# FUNÇÃO AUXILIAR PARA PROCURAR PADRÕES DE TEXTO 
+#----------------------------------------------------------------
 
-# Função auxiliar para procurar padrões de texto
 def _extract_field(text: str, pattern: str, group_index: int = 1) -> str | None:
     """
     Procura por um padrão de Regex e retorna o texto capturado.
     Retorna None se o padrão não for encontrado.
     """
+
+    # re.search procura o padrão em qualquer lugar do texto
     match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
+
+    # Se encontrou, retorna o grupo capturado
     if match:
         return match.group(group_index).strip()
+    
     return None
 
 
-# Função para extrair as informações
+#----------------------------------------------------------------
+# FUNÇÃO PRINCIPAL PARA EXTRAIR OS DADOS DO PDF
+# .. Retorna um dicionário com os campos extraídos ou um erro.
+#----------------------------------------------------------------
+
 async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
     """
     Extrai informações de CNPJ de um PDF de formulário usando Regex.
@@ -35,7 +46,7 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
     # Estrutura onde ficarão os campos extraídos
     extracted_data = {}
     
-    # Dicionário com as labels dos campos e os padrões que serão procurados no PDF
+    # Dicionário com os campos e os padrões de texto que serão procurados no PDF
     field_patterns = {
         'numero_de_inscricao': r'NÚMERO DE INSCRIÇÃO.*?(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})',
         'data_de_abertura': r'DATA DE ABERTURA\s+([^\n]+)',
@@ -63,25 +74,39 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
     }
 
     try:
+
+        # Abrir o PDF com PyMuPDF
         doc = fitz.open(stream=pdf_content, filetype="pdf")
+
+        # Extrair o texto da primeira página
         page = doc[0]
+
+        # Pegar o texto completo
         full_text = page.get_text("text")
 
+        # Percorrer o dicionário de campos e padrões e extrair os dados
         for field, pattern in field_patterns.items():
             extracted_data[field] = _extract_field(full_text, pattern)
 
-        # Verifica se o campo número de inscrição foi encontrado (usando 2 campos chave para validar)
+        # Validar se alguns campos essenciais foram encontrados
         if not extracted_data.get('numero_de_inscricao') and not extracted_data.get('nome_empresarial'):
-            raise InvalidCNPJDocumentError("O documento PDF não é um cartão CNPJ válido.")
+            raise InvalidCNPJDocumentError("Não é um cartão CNPJ válido.")
 
     except InvalidCNPJDocumentError as e:
         return {"error": str(e)}
+    
     except fitz.FileDataError:
         return {"error": "O arquivo fornecido não é um PDF válido ou está corrompido."}
+    
     except IndexError:
         # Captura erros ao acessar páginas inexistentes
         return {"error": "O PDF não contém páginas ou a página solicitada não existe."}
+    
     except re.error as regex_error:
         return {"error": f"Erro na expressão regular: {regex_error}"}
+    
+    except Exception as e:
+        return {"error": f"Erro inesperado ao processar o PDF: {e}"}
 
+    # Retornar os dados extraídos
     return {"extracted_data": extracted_data}
