@@ -43,7 +43,7 @@ expeted_csv = "numero_de_inscricao,data_de_abertura,nome_empresarial,nome_de_fan
 def test_generate_csv_200_all_fields():
 
     # Simula o envio do payload via endpoint
-    response = client.post("/download-csv/", json=test_payload)
+    response = client.post("/download_csv/", json=test_payload)
 
     # Normaliza o texto para remover diferenças de quebras de linha entre SOs
     response_text_normalized = response.text.replace('\r\n', '\n')
@@ -68,7 +68,7 @@ def test_generate_csv_400_empty_data():
     }
 
     # Simula o envio do payload via endpoint
-    response = client.post("/download-csv/", json=empty_data_payload)
+    response = client.post("/download_csv/", json=empty_data_payload)
 
     # Verifica se o status code é 400 (Bad Request)
     assert response.status_code == 400
@@ -86,7 +86,7 @@ def test_generate_csv_400_empty_data():
 def test_generate_csv_200_filtered_fields():
 
     # URL com query params para filtrar campos
-    url_with_query = "/download-csv/?fields=numero_de_inscricao&fields=nome_empresarial&fields=atividade_principal"
+    url_with_query = "/download_csv/?fields=numero_de_inscricao&fields=nome_empresarial&fields=atividade_principal"
 
     expeted_csv = "numero_de_inscricao,nome_empresarial,atividade_principal\n58.351.146/0001-61,58.351.146 MARTHA LACERDA EMIDIO DA SILVA,85.92-9-03 - Ensino de música\n"
 
