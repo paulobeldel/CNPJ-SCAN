@@ -58,23 +58,23 @@ async def extract(files: List[UploadFile] = File(...)):
                 # Se tiver um erro, adicionar um JSON com status de falha
                 list_of_results.append({
                     "filename": file.filename,
-                    "status": "Falha na extração",
-                    "error": extracted_data['error']
+                    "status": extracted_data["error"],
+                    "error": True
                 })
             
             else:
                 # Se não tiver erro, adicionar um JSON com os dados extraídos
                 list_of_results.append({
                     "filename": file.filename,
-                    "status": "Processado com sucesso",
+                    "status": "OK",
                     "extracted_data": extracted_data.get("extracted_data", {})
                 })
         
         except Exception as e:
             list_of_results.append({
                 "filename": file.filename,
-                "status": "Falha na extração",
-                "error": f"Erro ao ler o arquivo: {e}"
+                "status": f"Falha na extração: {e}",
+                "error": True
             })
     
     # Retornar a lista de resultados

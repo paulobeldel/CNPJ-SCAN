@@ -96,11 +96,11 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
         return {"error": str(e)}
     
     except fitz.FileDataError:
-        return {"error": "O arquivo fornecido não é um PDF válido ou está corrompido."}
+        return {"error": "PDF inválido ou corrompido."}
     
     except IndexError:
         # Captura erros ao acessar páginas inexistentes
-        return {"error": "O PDF não contém páginas ou a página solicitada não existe."}
+        return {"error": "PDF não contém páginas ou a página solicitada não existe."}
     
     except re.error as regex_error:
         return {"error": f"Erro na expressão regular: {regex_error}"}

@@ -32,7 +32,7 @@ def generate_csv_from_data(
     #print("\nDEBUG - Dados extraídos para CSV:", extracted_data)
 
     # Lista com dados válidos (sem erros)
-    valid_data = [data for data in extracted_data_list if "error" not in data]
+    valid_data = [data for data in extracted_data_list if "extracted_data" in data]
     
     #print(f"\nDEBUG - Dados válidos para CSV: {valid_data}")
 
