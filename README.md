@@ -28,7 +28,7 @@ A solução foi construída com foco em performance, manutenção e escalabilida
 | **Lógica de Negócio** | **`re` (Regex)** | Engenharia de dados para identificar e extrair mais de 20 campos de formulários complexos. |
 | **Relatórios** | **`csv`** | Geração eficiente de relatórios tabulares em formato CSV. |
 | **Qualidade & Testes** | **`pytest` / `pytest-asyncio` / `httpx`** | Testes unitários e de integração para garantir a funcionalidade e a robustez da API. |
-| **Arquitetura** | **`routers` / `services` / `core`** | Implementação do Princípio da Responsabilidade Única e desacoplamento de código. |
+| **Arquitetura** | **`routers` / `services` / `core`** | Implementação do princípio da responsabilidade única e desacoplamento de código. |
 
 ---
 .
