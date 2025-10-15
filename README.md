@@ -73,10 +73,12 @@ git clone https://github.com/paulobeldel/CNPJ-SCAN.git
 
 # 2. Crie e Ative o ambiente virtual
 python -m venv venv
-# Windows:
+
+# Ativar no Windows (powershell):
 .\venv\Scripts\activate
-# macOS/Linux/GitBash:
-source venv/Script/activate
+
+# Ativar no macOS/Linux (bash):
+source venv/Scripts/activate
 
 # 3. Instale as Dependências
 pip install -r requirements.txt
