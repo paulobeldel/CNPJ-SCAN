@@ -14,9 +14,13 @@ from config import settings # Importa as configuracoes
 # Define o titulo da API usando a variavel
 app = FastAPI(title=f"Minha API - {settings.API_VERSION}")
 
+origins = ["http://localhost:5173",  # Permite o frontend Vite/React
+    "http://localhost:5174"]
+
 # 1. Configurando o CORS (MUITO importante para o React)
 app.add_middleware(
     CORSMiddleware,
+    # allow_origins=origins,
     allow_origins=settings.list_cors_origins, # Permite que o frontend se conecte
     allow_credentials=True,
     allow_methods=["*"],
