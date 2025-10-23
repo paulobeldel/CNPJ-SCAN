@@ -57,7 +57,8 @@ def generate_csv_from_data(
     output = io.StringIO(newline='')
     writer = csv.writer(
         output, # arquivo em memória
-        quoting=csv.QUOTE_MINIMAL
+        quoting=csv.QUOTE_MINIMAL,
+        delimiter=';'
     )
 
     # Escrever o cabeçalho
@@ -66,8 +67,22 @@ def generate_csv_from_data(
     # Escrever as linhas de dados - uma linha por dicionário na lista
     for data in valid_data:
 
+        extracted_data = data.get("extracted_data", {})
+
+        row_values =[]
+        for field in header:
+            value = extracted_data.get(field)
+
+            if value is None:
+                cleaned_value = ''
+            else:
+                # Converter pra string e substituir todas as quebras de linha por espaço
+                cleaned_value = str(value)
+                cleaned_value = cleaned_value.replace('\n', ' ').replace('\r', ' ')
+            row_values.append(cleaned_value)
+
         # Criar a linha com os valores na ordem do header
-        row_values = [str(data["extracted_data"].get(field)) for field in header]
+        # row_values = [str(data["extracted_data"].get(field)) for field in header]
         writer.writerow(row_values)
 
     # Retornar o conteúdo do CSV como string
