@@ -1,3 +1,4 @@
+from typing import Any, Dict
 import pytest
 from src.services.extraction_service import _extract_field, extract_data_from_pdf
 
@@ -86,6 +87,35 @@ test_data = [
     ('data_situacao_especial', r'DATA DA SITUAÇÃO ESPECIAL\s+([^\n]+)', '********')
 ]
 
+EXPECTED_PAYLOAD_DATA: Dict[str, Any] = {
+    'numero_de_inscricao': '58.351.146/0001-61',
+    'data_de_abertura': '04/12/2024',
+    'nome_empresarial': '58.351.146 MARTHA LACERDA EMIDIO DA SILVA',
+    'nome_de_fantasia': '********',
+    'porte': 'ME',
+    'atividade_principal': '85.92-9-03 - Ensino de música',
+    'atividades_secundarias': '85.92-9-99 - Ensino de arte e cultura não especificado anteriormente',
+    'natureza_juridica': '213-5 - Empresário (Individual)',
+    'logradouro': 'R DA MOEDA',
+    'numero': '111',
+    'complemento': '********',
+    'cep': '50.030-040',
+    'bairro': 'RECIFE',
+    'municipio': 'RECIFE',
+    'uf': 'PE',
+    'email': 'MARTHALACERDA89@GMAIL.COM',
+    'telefone': '(00) 0000-0000',
+    'efr': '*****',
+    'situacao_cadastral': 'ATIVA',
+    'data_situacao_cadastral': '04/12/2024',
+    'motivo_situacao_cadastral': '', # Campo vazio, mas deve ser capturado
+    'situacao_especial': '********',
+    'data_situacao_especial': '********'
+}
+
+# Caminho para PDF de teste
+PDF_TEST_PATH = 'tests/resources/cnpj_sample1.pdf'
+
 # ----Testes do _extract_field----
 
 # Parametrização dos testes (rodar o teste para cada padrão)
@@ -110,25 +140,27 @@ def test_extract_field_not_found():
     
     assert expected_result is None, f"Esperado None para campo inexistente, mas obteve '{expected_result}'"
 
-# ----Testes do extract_data_from_pdf----
+# # ----Testes do extract_data_from_pdf----
 
 # É uma função async, então o teste também deve ser async
 @pytest.mark.asyncio
 async def test_extract_data_from_pdf():
-    """Testa a extração de dados de um PDF"""
+    """Testa o fluxo completo da função extract_data_from_pdf com um PDF válido.
+    Verifica se o payload retornado corresponde ao esperado"""
     
     # Caminho do PDF usado no teste
-    pdf_path = 'tests/resources/cnpj_sample.pdf'
+    pdf_path ='tests/resources/cnpj_sample1.pdf'
 
     # Dicionário com os dados esperados (transformar a lista do ppadrões de teste em dicionário)
-    expected_data_payload = {key: value for key, _, value in test_data}
+    # expected_data_payload = {key: value for key, _, value in test_data}
     
     # O resultado esperado é o payload dentro de outro dicionário
-    expected_result = {"extracted_data": expected_data_payload}
+    # expected_result = {"extracted_data": expected_data_payload}
 
     with open(pdf_path, 'rb') as file:
         pdf_content = file.read()
     
     result = await extract_data_from_pdf(pdf_content)
 
-    assert result == expected_result, f"Falha na extração do PDF: Esperado {expected_result}, Obtido {result}"
+    assert 'extracted_data' in result, "Chave 'extracted_data' não encontrada no resultado."
+    assert result.get('extracted_data') == EXPECTED_PAYLOAD_DATA, f"Falha na extração do PDF: Esperado {EXPECTED_PAYLOAD_DATA}, Obtido {result}"

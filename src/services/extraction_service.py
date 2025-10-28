@@ -35,7 +35,7 @@ def _extract_field(text: str, pattern: str, group_index: int = 1) -> str | None:
 #----------------------------------------------------------------
 # PADRÃO PARA ATIVIDADES SECUNDÁRIAS - CASO DE +1 PAG.
 #----------------------------------------------------------------
-ATIVIDADES_SECUNDARIAS_PATTERN = r'ATIVIDADES ECONÔMICAS SECUNDÁRIAS\s+(.*?)CÓDIGO E DESCRIÇÃO DA NATUREZA JURÍDICA'
+SECUNDARIAS_PATTERN = r'ATIVIDADES ECONÔMICAS SECUNDÁRIAS\s+(.*?)CÓDIGO E DESCRIÇÃO DA NATUREZA'
 
 #----------------------------------------------------------------
 # FUNÇÃO PRINCIPAL PARA EXTRAIR OS DADOS DO PDF
@@ -110,7 +110,7 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
 
                 # Regex só precisa pegar o campo de atividades secundárias
                 # Extrair os dados e acumular
-                continuation_field = _extract_field(page_text, ATIVIDADES_SECUNDARIAS_PATTERN, 1)
+                continuation_field = _extract_field(page_text, SECUNDARIAS_PATTERN, 1)
                 
                 if continuation_field:
                     # Concatenar com o conteúdo da PAG 1
