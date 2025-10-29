@@ -32,6 +32,10 @@ def _extract_field(text: str, pattern: str, group_index: int = 1) -> str | None:
     
     return None
 
+#----------------------------------------------------------------
+# PADRÃO PARA ATIVIDADES SECUNDÁRIAS - CASO DE +1 PAG.
+#----------------------------------------------------------------
+SECUNDARIAS_PATTERN = r'ATIVIDADES ECONÔMICAS SECUNDÁRIAS\s+(.*?)CÓDIGO E DESCRIÇÃO DA NATUREZA'
 
 #----------------------------------------------------------------
 # FUNÇÃO PRINCIPAL PARA EXTRAIR OS DADOS DO PDF
@@ -54,7 +58,7 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
         'nome_de_fantasia': r'\(NOME DE FANTASIA\)\s+(.*?)PORTE',
         'porte': r'PORTE\s+([^\n]+)',
         'atividade_principal': r'ATIVIDADE ECONÔMICA PRINCIPAL\s+(.*?)CÓDIGO',
-        'atividades_secundarias': r'ATIVIDADES ECONÔMICAS SECUNDÁRIAS\s+(.*?)CÓDIGO',
+        'atividades_secundarias': r'ATIVIDADES ECONÔMICAS SECUNDÁRIAS\s+(.*?)CÓDIGO E DESCRIÇÃO DA NATUREZA JURÍDICA',
         'natureza_juridica': r'NATUREZA JURÍDICA\s+(.*?)LOGRADOURO',
         'logradouro': r'LOGRADOURO\s+(.*?)NÚMERO',
         'numero': r'LOGRADOURO.*?NÚMERO\s+([^\n]+)', # número que vem depois de logradouro
@@ -78,29 +82,52 @@ async def extract_data_from_pdf(pdf_content: bytes) -> Dict[str, Any]:
         # Abrir o PDF com PyMuPDF
         doc = fitz.open(stream=pdf_content, filetype="pdf")
 
-        # Extrair o texto da primeira página
-        page = doc[0]
+        # -- PROCESSAMENTO DA PAG 1
 
-        # Pegar o texto completo
-        full_text = page.get_text("text")
+        # Extrair o texto da PAG 1
+        page_one_text = doc[0].get_text("text")
 
-        # Percorrer o dicionário de campos e padrões e extrair os dados
+        # Percorrer o dicionário de campos e padrões e extrair os dados da PAG 1
         for field, pattern in field_patterns.items():
-            extracted_data[field] = _extract_field(full_text, pattern)
+            extracted_data[field] = _extract_field(page_one_text, pattern)
 
-        # Validar se alguns campos essenciais foram encontrados
+        # Validar se PAG 1 é cartão cnpj (campos essenciais encontrados)
         if not extracted_data.get('numero_de_inscricao') and not extracted_data.get('nome_empresarial'):
             raise InvalidCNPJDocumentError("Não é um cartão CNPJ válido.")
+
+        # -- PROCESSAMENTO DE PAGS SUBSEQUENTES
+
+        # Variável pra acumular o texto das atividades secundárias
+        full_secundarias_text = extracted_data.get('atividades_secundarias', '')
+
+        # Iterar a partir da segunda página (indice 1)
+        for i in range(1, len(doc)):
+            page_text = doc[i].get_text("text")
+
+            # Checar se a pagina tem o padrão de atividades secundárias
+            # Dados ainda não extraídos
+            if "ATIVIDADES ECONÔMICAS SECUNDÁRIAS" in page_text:
+
+                # Regex só precisa pegar o campo de atividades secundárias
+                # Extrair os dados e acumular
+                continuation_field = _extract_field(page_text, SECUNDARIAS_PATTERN, 1)
+                
+                if continuation_field:
+                    # Concatenar com o conteúdo da PAG 1
+                    full_secundarias_text += " " + continuation_field
+            
+        # -- ATUALIZA O CAMPO FINAL
+        extracted_data['atividades_secundarias'] = full_secundarias_text.strip()
 
     except InvalidCNPJDocumentError as e:
         return {"error": str(e)}
     
     except fitz.FileDataError:
-        return {"error": "O arquivo fornecido não é um PDF válido ou está corrompido."}
+        return {"error": "PDF inválido ou corrompido."}
     
     except IndexError:
         # Captura erros ao acessar páginas inexistentes
-        return {"error": "O PDF não contém páginas ou a página solicitada não existe."}
+        return {"error": "PDF não contém páginas ou a página solicitada não existe."}
     
     except re.error as regex_error:
         return {"error": f"Erro na expressão regular: {regex_error}"}
