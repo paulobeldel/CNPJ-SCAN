@@ -1,0 +1,6 @@
+# Ignorar pastas de cache do Python
+__pycache__/
+
+# Outros arquivos Python que devem ser ignorados (boas práticas)
+*.pyc
+venv/
